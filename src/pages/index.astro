@@ -1,0 +1,224 @@
+---
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microphone Comparison</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --background-color: #f8fafc;
+            --text-color: #1e293b;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.5;
+            color: var(--text-color);
+            background: var(--background-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+        }
+
+        .mic-grid {
+            display: grid;
+            gap: 2rem;
+        }
+
+        .mic-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
+        .mic-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        .progress-bar {
+            flex-grow: 1;
+            height: 4px;
+            background: #e2e8f0;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress {
+            width: 0%;
+            height: 100%;
+            background: var(--primary-color);
+            transition: width 0.1s linear;
+        }
+
+        @media (min-width: 640px) {
+            .mic-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎙️ Mic Check 🎤</h1>
+        <p>
+            All tests are using the following signal chain:
+            
+            <ul>
+                <li><a href="https://www.ams-neve.com/outboard/1073-range/1073lb/">Neve 1073LB</a> Preamp</li>
+                <li><a href="https://www.blacklionaudio.com/store/compressors/bluey-fet-limiter/">Black Lion Audio Bluey</a> FET 1176-style limiting amplifier</li>
+                <li><a href="https://www.ferrofish.com/product/pulse16-mx/">Ferrofish Pulse 16MX</a> A/D Converter at 24bit/96kHz</li>
+                <li><a href="https://www.rme-usa.com/digiface-usb.html">RME Digiface USB</a> Audio Interface</li>
+            </ul> 
+
+            Tests were normalized to achieve equal leveling. No additional processing was done to preserve the mic's natural characteristics.
+        </p>
+        <hr />
+        <div class="mic-grid">
+            <div class="mic-card">
+                <div class="mic-name"><a href="https://www.neumann.com/en-us/products/microphones/tlm-103">Neumann TLM 103</a> (Close)</div>
+                <div class="controls">
+                    <button data-file="/Neumann%20TLM-103%20Close.wav">Play</button>
+                    <div class="progress-bar">
+                        <div class="progress"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="mic-card">
+                <div class="mic-name"><a href="https://www.neumann.com/en-us/products/microphones/tlm-103">Neumann TLM-103</a> (Normal)</div>
+                <div class="controls">
+                    <button data-file="/Neumann%20TLM-103%20Normal.wav">Play</button>
+                    <div class="progress-bar">
+                        <div class="progress"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="mic-card">
+                <div class="mic-name"><a href="https://www.shure.com/en-US/products/microphones/beta_87c?variant=BETA87C">Shure Beta 87C</a></div>
+                <div class="controls">
+                    <button data-file="/Shure%20Beta%2087C.wav">Play</button>
+                    <div class="progress-bar">
+                        <div class="progress"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="mic-card">
+                <div class="mic-name"><a href="https://www.shure.com/en-US/products/microphones/sm57?variant=SM57-LC">Shure SM-57</a></div>
+                <div class="controls">
+                    <button data-file="/Shure%20SM-57.wav">Play</button>
+                    <div class="progress-bar">
+                        <div class="progress"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="mic-card">
+                <div class="mic-name"><a href="https://www.shure.com/en-US/products/microphones/sm7b?variant=SM7B">Shure SM7B</a> (with <a href="https://www.cloudmicrophones.com/product-page/cloudlifter-cl-z">CloudLifter CL-Z)</a></div>
+                <div class="controls">
+                    <button data-file="/Shure%20SM-7B.wav">Play</button>
+                    <div class="progress-bar">
+                        <div class="progress"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentAudio = null;
+        let currentButton = null;
+
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('click', () => togglePlay(button));
+        });
+
+        function togglePlay(button) {
+            const filename = button.dataset.file;
+            
+            if (currentAudio && currentAudio.src.endsWith(decodeURIComponent(filename))) {
+                if (currentAudio.paused) {
+                    currentAudio.play();
+                    button.textContent = 'Pause';
+                } else {
+                    currentAudio.pause();
+                    button.textContent = 'Play';
+                }
+                return;
+            }
+
+            if (currentAudio) {
+                currentAudio.pause();
+                if (currentButton) {
+                    currentButton.textContent = 'Play';
+                    updateProgress(currentButton.parentElement.querySelector('.progress'), 0);
+                }
+            }
+
+            currentButton = button;
+            currentAudio = new Audio(filename);
+            
+            currentAudio.addEventListener('timeupdate', () => {
+                const progress = (currentAudio.currentTime / currentAudio.duration) * 100;
+                updateProgress(button.parentElement.querySelector('.progress'), progress);
+            });
+
+            currentAudio.addEventListener('ended', () => {
+                button.textContent = 'Play';
+                updateProgress(button.parentElement.querySelector('.progress'), 0);
+            });
+
+            currentAudio.addEventListener('error', (e) => {
+                console.error('Error loading audio:', e);
+                button.textContent = 'Error';
+            });
+
+            currentAudio.play().catch(error => {
+                console.error('Error playing audio:', error);
+                button.textContent = 'Error';
+            });
+            button.textContent = 'Pause';
+        }
+
+        function updateProgress(progressElement, value) {
+            progressElement.style.width = `${value}%`;
+        }
+    </script>
+</body>
+</html>
